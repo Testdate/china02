@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ขอโทษนะที่รัก</title>
+  <style>
+    body {
+      background: #000;
+      color: white;
+      font-family: 'Prompt', sans-serif;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .confetti {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: 1; /* อยู่หลังข้อความ */
+    }
+
+    .heartDrop {
+      position: absolute;
+      color: pink;
+      animation: fall linear;
+    }
+
+    @keyframes fall {
+      from {
+        transform: translateY(-10px) rotate(0deg);
+        opacity: 0.9;
+      }
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .card {
+      position: relative;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(12px);
+      padding: 24px 32px;
+      border-radius: 20px;
+      box-shadow: 0 0 24px rgba(255, 192, 203, 0.4);
+      text-align: center;
+      width: 360px;
+      z-index: 2; /* เหนือหัวใจ */
+    }
+
+    #avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: url('https://i.imgur.com/ZWbC1Xn.png') center/cover no-repeat;
+      margin: 0 auto 16px;
+      cursor: pointer;
+      border: 3px solid pink;
+      box-shadow: 0 0 12px pink;
+      z-index: 3;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 1.5em;
+      margin-bottom: 16px;
+    }
+
+    #type {
+      white-space: pre-wrap;
+      font-size: 1em;
+      line-height: 1.6;
+      min-height: 160px;
+    }
+
+    #editBtn {
+      margin-top: 20px;
+      background: pink;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 20px;
+      cursor: pointer;
+      color: black;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    #editBtn:hover {
+      background: #ff8ac7;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="confetti" id="confetti"></div>
+
+  <div class="card">
+    <div class="avatar" id="avatar"
+        style="background:url('https://cdn.discordapp.com/attachments/1279386618272157706/1423170008468557824/FCAA7D16-EEF8-4DBB-A5AB-37E456A9FD98.jpg?ex=69078b9b&is=69063a1b&hm=cc7be66585eb1faccd6c2b4ef34ec967cc9ac016cb7478566010282bdcc93275&') center/cover no-repeat;">
+    </div>
+
+    <h1 id="title">ถึงเบบี๋ของเค้า 💞</h1>
+    <p id="type"></p>
+    
+  </div>
+
+  <script>
+    const defaultMsg = `\n\nเค้ารู้ว่าเค้าทำผิด และคำว่า "ขอโทษ" มันอาจไม่พอ แต่ตั้งใจจะเปลี่ยนจริง ๆ\n\nขออีกครั้งได้ไหม ให้เค้าพิสูจน์ว่าเค้าดีขึ้นเพื่อเบบี๋ \n\nรักเบบี๋เสมอ 💗`;
+
+    const typeEl = document.getElementById('type');
+    const editBtn = document.getElementById('editBtn');
+    const confettiEl = document.getElementById('confetti');
+
+    // ฟังก์ชันพิมพ์ข้อความแบบ Typewriter
+    function typeWriter(text, el, speed = 24) {
+      el.textContent = '';
+      let i = 0;
+      const timer = setInterval(() => {
+        el.textContent += text.charAt(i);
+        i++;
+        if (i >= text.length) clearInterval(timer);
+      }, speed);
+    }
+
+    // ฟังก์ชันหัวใจร่วง
+    function spawnHearts(n = 12) {
+      for (let i = 0; i < n; i++) {
+        const h = document.createElement('div');
+        h.className = 'heartDrop';
+        h.style.left = Math.random() * 100 + '%';
+        h.style.fontSize = (12 + Math.random() * 36) + 'px';
+        h.style.animationDuration = (2.4 + Math.random() * 2) + 's';
+        h.style.transform = `translateY(-20px) rotate(${Math.random() * 360}deg)`;
+        h.innerHTML = '❤';
+        confettiEl.appendChild(h);
+        setTimeout(() => h.remove(), 4200);
+      }
+    }
+
+    // เริ่มหัวใจร่วงอัตโนมัติ (ด้านหลัง)
+    setInterval(() => spawnHearts(8), 1000);
+
+    // พิมพ์ข้อความเริ่มต้น
+    let currentMsg = defaultMsg;
+    typeWriter(currentMsg, typeEl, 20);
+
+    // ปุ่มแก้ข้อความ
+    editBtn.addEventListener('click', () => {
+      const newName = prompt('ใส่ชื่อเธอ (จะใส่ในหัวข้อ):', 'ที่รัก');
+      const newMsg = prompt('แก้ข้อความขอโทษ:', currentMsg);
+      if (newName) document.getElementById('title').textContent = `ถึง ${newName} 💞`;
+      if (newMsg) { currentMsg = newMsg; typeWriter(newMsg, typeEl, 20); }
+    });
+
+    // เปลี่ยนรูปเมื่อคลิก
+    const avatar = document.getElementById('avatar');
+    avatar.addEventListener('click', () => {
+      const url = prompt('วาง URL รูปของเธอ (หรือชื่อย่อ):');
+      if (!url) return;
+      if (url.match(/^(https?:)?\/\/.+\.(jpg|jpeg|png|webp|gif)$/i)) {
+        avatar.style.background = `url(${url}) center/cover no-repeat`;
+        avatar.textContent = '';
+      } else {
+        avatar.textContent = url;
+        avatar.style.background = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
